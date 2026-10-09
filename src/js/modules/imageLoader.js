@@ -4,7 +4,9 @@ holder.ondragover = () => false;
 holder.ondragend = () => false;
 
 function checkFiles(files) {
-  return Array.from(files).filter((file) => /image/.exec(file.type));
+  return Array.from(files).filter((file) =>
+    /^image\/(jpeg|png|gif|webp)$/.test(file.type),
+  );
 }
 
 export default new Promise((resolve, reject) => {
