@@ -1,36 +1,48 @@
-import { canCopy, copyPng, downloadBlob, downloadJpg } from "./exporter";
+import {
+  canCopy,
+  canShare,
+  copyPng,
+  download,
+  jpegFile,
+  share,
+} from "./exporter";
 import { encodeGif, SPEEDS } from "./gif";
 
 function nextPaint() {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
-async function downloadGif(meme, status) {
+async function memeFile(meme, canvas, status) {
+  if (meme.output !== "gif") return jpegFile(canvas);
   status.textContent = "Making your GIF…";
   await nextPaint();
   const { image, frames, options, speed } = meme;
-  downloadBlob(
-    encodeGif(image, frames, options, SPEEDS[speed]),
-    "zoommeme.gif",
-  );
-  status.textContent = "Downloaded zoommeme.gif";
-}
-
-async function downloadStack(canvas, status) {
-  await downloadJpg(canvas);
-  status.textContent = "Downloaded zoommeme.jpg";
+  const blob = encodeGif(image, frames, options, SPEEDS[speed]);
+  return new File([blob], "zoommeme.gif", { type: "image/gif" });
 }
 
 export function bindActions(root, canvas, currentMeme) {
   const status = root.querySelector(".status");
 
   root.querySelector(".download").addEventListener("click", async () => {
-    const meme = currentMeme();
     try {
-      if (meme.output === "gif") await downloadGif(meme, status);
-      else await downloadStack(canvas, status);
+      const file = await memeFile(currentMeme(), canvas, status);
+      download(file);
+      status.textContent = `Downloaded ${file.name}`;
     } catch {
       status.textContent = "Couldn't create the image. Try again.";
+    }
+  });
+
+  root.querySelector(".share").addEventListener("click", async () => {
+    try {
+      await share(await memeFile(currentMeme(), canvas, status));
+      status.textContent = "Shared";
+    } catch (err) {
+      status.textContent =
+        err.name === "AbortError"
+          ? ""
+          : "Couldn't share the image. Download it instead.";
     }
   });
 
@@ -46,9 +58,11 @@ export function bindActions(root, canvas, currentMeme) {
 
 export function renderActions(root, state) {
   const gif = state.output === "gif";
-  root.querySelector(".download").textContent = gif
-    ? "Download GIF"
-    : "Download JPG";
+  const sharing = canShare();
+  const downloadButton = root.querySelector(".download");
+  downloadButton.textContent = gif ? "Download GIF" : "Download JPG";
+  downloadButton.classList.toggle("btn--ghost", sharing);
+  root.querySelector(".share").hidden = !sharing;
   // Browsers can only put PNGs on the clipboard, so GIFs are download-only.
   root.querySelector(".copy").hidden = gif || !canCopy();
 }

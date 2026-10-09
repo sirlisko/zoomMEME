@@ -10,18 +10,18 @@ function toBlob(canvas, type, quality) {
   });
 }
 
-export function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+export async function jpegFile(canvas) {
+  const blob = await toBlob(canvas, "image/jpeg", JPEG_QUALITY);
+  return new File([blob], "zoommeme.jpg", { type: "image/jpeg" });
 }
 
-export async function downloadJpg(canvas) {
-  const blob = await toBlob(canvas, "image/jpeg", JPEG_QUALITY);
-  downloadBlob(blob, "zoommeme.jpg");
+export function download(file) {
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = file.name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function canCopy() {
@@ -32,4 +32,13 @@ export function copyPng(canvas) {
   return navigator.clipboard.write([
     new ClipboardItem({ "image/png": toBlob(canvas, "image/png") }),
   ]);
+}
+
+export function canShare() {
+  const probe = new File([""], "zoommeme.jpg", { type: "image/jpeg" });
+  return Boolean(navigator.canShare?.({ files: [probe] }));
+}
+
+export function share(file) {
+  return navigator.share({ files: [file] });
 }
