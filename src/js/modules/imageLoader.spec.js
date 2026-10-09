@@ -7,7 +7,7 @@ beforeEach(() => {
     <div id="holder">
       <input type="text" />
     </div>
-    <div class="dropper"></div>
+    <main class="landing"></main>
     <p class="error" hidden></p>
   `;
 });

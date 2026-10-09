@@ -18,7 +18,7 @@ export default new Promise((resolve) => {
     if (images.length) {
       clearError();
       resolve(images);
-      document.querySelector(".dropper").setAttribute("hidden", "hidden");
+      document.querySelector(".landing").hidden = true;
     } else {
       errorHandler(
         new Error(
