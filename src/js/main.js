@@ -1,23 +1,11 @@
-import attachToDOM from "./modules/attachToDom";
 import showDemo from "./modules/demo";
-import isTouchDevice from "./modules/device";
+import createEditor from "./modules/editor";
 import errorHandler from "./modules/errorHandler";
-import imageLoader from "./modules/imageLoader";
-import imagePosition from "./modules/imagePosition";
+import onImage from "./modules/imageLoader";
 import imageRender from "./modules/imageRender";
-import imageSaver from "./modules/imageSaver";
-import imageZoom from "./modules/imageZoom";
 
 showDemo();
 
-if (isTouchDevice()) {
-  document.body.classList.add("mobile");
-}
+const editor = createEditor();
 
-imageLoader
-  .then(imageRender)
-  .then(attachToDOM)
-  .then(imagePosition)
-  .then(imageZoom)
-  .then(imageSaver)
-  .catch(errorHandler);
+onImage((file) => imageRender(file).then(editor.open).catch(errorHandler));

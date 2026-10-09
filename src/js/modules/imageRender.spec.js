@@ -1,27 +1,30 @@
 import imageRender from "./imageRender";
 
-const readAsDataURL = vi.fn();
+let image;
 
-let reader;
-
-window.FileReader = class {
-  readAsDataURL = readAsDataURL;
-
-  constructor() {
-    reader = this;
-  }
-};
-
-test("should read the file", () => {
-  imageRender(["foo"]);
-
-  expect(readAsDataURL).toHaveBeenCalledWith("foo");
+beforeEach(() => {
+  URL.createObjectURL = vi.fn(() => "blob:foo");
+  window.Image = class {
+    constructor() {
+      image = this;
+    }
+  };
 });
 
-test("should reject when the file cannot be read", async () => {
-  const result = imageRender(["foo"]);
+test("resolves once the image has loaded", async () => {
+  const result = imageRender("file");
+  expect(URL.createObjectURL).toHaveBeenCalledWith("file");
+  expect(image.src).toBe("blob:foo");
 
-  reader.onerror();
+  image.onload();
+
+  await expect(result).resolves.toBe(image);
+});
+
+test("rejects when the image cannot be read", async () => {
+  const result = imageRender("file");
+
+  image.onerror();
 
   await expect(result).rejects.toThrow(
     "That image couldn't be read. Choose another one.",

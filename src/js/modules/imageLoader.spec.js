@@ -1,83 +1,62 @@
-import mockEvent from "./utils";
+import onImage from "./imageLoader";
+
+const png = { type: "image/png" };
+
+function choose(files) {
+  const input = document.querySelector("input");
+  Object.defineProperty(input, "files", { value: files, configurable: true });
+  input.dispatchEvent(new Event("change"));
+}
+
+function drop(files) {
+  const event = new Event("drop", { cancelable: true });
+  event.dataTransfer = { files };
+  document.getElementById("holder").dispatchEvent(event);
+  return event;
+}
+
+let callback;
 
 beforeEach(() => {
-  vi.resetModules();
-
   document.body.innerHTML = `
-    <div id="holder">
-      <input type="text" />
-    </div>
-    <main class="landing"></main>
+    <main id="holder"><input type="file" /></main>
     <p class="error" hidden></p>
   `;
+  callback = vi.fn();
+  onImage(callback);
 });
 
-describe("file input", () => {
-  test("read files and filter images", async () => {
-    const mockInput = mockEvent("input", "onchange");
-    const imageLoader = (await import("./imageLoader")).default;
+test("passes on a chosen image", () => {
+  choose([png]);
 
-    mockInput.cb({ target: { files: [{ type: "image/png" }] } });
-
-    expect(await imageLoader).toBeTruthy();
-  });
-
-  test("shows an error if not images, then accepts a retry", async () => {
-    const mockInput = mockEvent("input", "onchange");
-    const imageLoader = (await import("./imageLoader")).default;
-    const error = document.querySelector(".error");
-
-    mockInput.cb({ target: { files: [{ type: "text" }] } });
-
-    expect(error.hidden).toBe(false);
-    expect(error.textContent).toContain("isn't supported");
-
-    mockInput.cb({ target: { files: [{ type: "image/png" }] } });
-
-    expect(await imageLoader).toBeTruthy();
-    expect(error.hidden).toBe(true);
-  });
+  expect(callback).toHaveBeenCalledWith(png);
 });
 
-test("rejects svg images", async () => {
-  const mockInput = mockEvent("input", "onchange");
-  await import("./imageLoader");
+test("passes on a dropped image", () => {
+  const event = drop([{ type: "text/plain" }, png]);
 
-  mockInput.cb({ target: { files: [{ type: "image/svg+xml" }] } });
-
-  expect(document.querySelector(".error").hidden).toBe(false);
+  expect(callback).toHaveBeenCalledWith(png);
+  expect(event.defaultPrevented).toBe(true);
 });
 
-describe("file drop", () => {
-  test("read files and filter images", async () => {
-    const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = (await import("./imageLoader")).default;
+test("shows an error for unsupported files, then accepts a retry", () => {
+  const error = document.querySelector(".error");
 
-    mockDrop.cb({
-      preventDefault: () => {},
-      dataTransfer: { files: [{ type: "image/png" }] },
-    });
+  choose([{ type: "image/svg+xml" }]);
 
-    expect(await imageLoader).toBeTruthy();
-  });
+  expect(callback).not.toHaveBeenCalled();
+  expect(error.hidden).toBe(false);
+  expect(error.textContent).toContain("isn't supported");
 
-  test("shows an error if not images", async () => {
-    const mockDrop = mockEvent("#holder", "ondrop");
-    await import("./imageLoader");
+  choose([png]);
 
-    mockDrop.cb({
-      preventDefault: () => {},
-      dataTransfer: { files: [{ type: "text" }] },
-    });
-
-    expect(document.querySelector(".error").hidden).toBe(false);
-  });
+  expect(callback).toHaveBeenCalledWith(png);
+  expect(error.hidden).toBe(true);
 });
 
-test("disable holder dragover and dragend", async () => {
-  await import("./imageLoader");
+test("accepts more than one photo over time", () => {
+  choose([png]);
+  drop([png]);
 
-  const holder = document.querySelector("#holder");
-  expect(holder.ondragover()).toBeFalsy();
-  expect(holder.ondragend()).toBeFalsy();
+  expect(callback).toHaveBeenCalledTimes(2);
 });

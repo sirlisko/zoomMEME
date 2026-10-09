@@ -35,7 +35,7 @@
 <body>
   <header class="site-header">
     <p class="logo caption"><span class="logo__dot" aria-hidden="true"></span>ZoomME.ME</p>
-    <a href="https://github.com/sirLisko/zoommeme">GitHub</a>
+    <button type="button" class="btn btn--ghost new-photo" hidden>New photo</button>
   </header>
   <p class="error" role="alert" hidden></p>
   <main class="landing" id="holder">
@@ -69,33 +69,47 @@
       <figcaption class="demo__credit"><a></a></figcaption>
     </figure>
   </main>
-  <article class="zoom" hidden>
-    <ul class="zoom__box">
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-    </ul>
-    <label class="zoom__checkbox"><input type="checkbox" name="watermark" id="watermark" checked />Allow
-      watermark on generated image</label>
-    <button type="button" class="zoom__save">Save Image</button>
-  </article>
+  <main class="editor" hidden>
+    <section class="editor__source" aria-label="Source photo">
+      <button type="button" class="source" aria-label="Focus point. Click a spot or use the arrow keys to move it.">
+        <img class="source__photo" alt="" />
+        <span class="source__marks" aria-hidden="true"></span>
+        <span class="source__focus" aria-hidden="true"></span>
+      </button>
+      <p class="editor__hint">Click the spot to zoom into. Arrow keys nudge it.</p>
+      <div class="editor__settings">
+        <label class="setting setting--zoom">
+          <span class="setting__label">Zoom <output class="zoom-value"></output></span>
+          <input type="range" class="zoom-range" min="2" max="16" step="1" />
+        </label>
+        <fieldset class="setting">
+          <legend class="setting__label">Frames</legend>
+          <div class="chips frame-count">
+            <button type="button" class="chip" value="3" aria-pressed="false">3</button>
+            <button type="button" class="chip" value="4" aria-pressed="true">4</button>
+            <button type="button" class="chip" value="5" aria-pressed="false">5</button>
+          </div>
+        </fieldset>
+      </div>
+      <details class="fine-tune">
+        <summary>Adjust frames one by one</summary>
+        <ul class="fine-tune__list"></ul>
+      </details>
+    </section>
+    <aside class="editor__result" aria-label="Your meme">
+      <h2 class="editor__heading caption">Your meme</h2>
+      <canvas class="preview" role="img" aria-label="Preview of your meme"></canvas>
+      <div class="editor__options">
+        <label class="check"><input type="checkbox" class="overlay-toggle" checked /> Camcorder overlay</label>
+        <label class="check"><input type="checkbox" class="credit-toggle" checked /> Add zoomme.me credit</label>
+      </div>
+      <div class="editor__actions">
+        <button type="button" class="btn download">Download JPG</button>
+        <button type="button" class="btn btn--ghost copy" hidden>Copy image</button>
+      </div>
+      <p class="status" role="status"></p>
+    </aside>
+  </main>
   <footer class="site-footer">
     <span>Made by <a href="https://sirlisko.com">sirlisko</a>, inspired by <a href="https://twitter.com/GianlucaMezzo">Gianluca Mezzo</a>.</span>
     <a href="https://github.com/sirLisko/zoommeme">Source on GitHub</a>

@@ -1,19 +1,9 @@
-function renderImage([file]) {
-  const reader = new FileReader();
-
+export default function imageRender(file) {
   return new Promise((resolve, reject) => {
-    reader.onload = (event) => {
-      const image = new Image();
-      image.src = event.target.result;
-
-      resolve(image);
-    };
-
-    reader.onerror = () =>
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () =>
       reject(new Error("That image couldn't be read. Choose another one."));
-
-    reader.readAsDataURL(file);
+    image.src = URL.createObjectURL(file);
   });
 }
-
-export default renderImage;

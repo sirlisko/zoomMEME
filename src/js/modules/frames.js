@@ -5,6 +5,10 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+export function formatZoom(zoom) {
+  return `${Math.round(zoom * 10) / 10}×`;
+}
+
 export function zoomLevels(maxZoom, count, adjustments = []) {
   return Array.from({ length: count }, (_, i) =>
     Math.max(
