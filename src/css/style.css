@@ -85,6 +85,7 @@ header p {
   line-height: 2.5rem;
   margin: 0 auto;
   overflow: hidden;
+  position: relative;
   width: 15rem;
 }
 @media (min-width: 500px) {
@@ -95,11 +96,20 @@ header p {
     width: 20rem;
   }
 }
-.dropper label:hover {
+.dropper label:hover,
+.dropper label:focus-within {
   border-color: currentColor;
 }
+.dropper label:focus-within {
+  outline: 3px solid #f1a208;
+  outline-offset: 4px;
+}
 .dropper input {
-  display: none;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
 }
 
 .zoom {
