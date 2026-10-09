@@ -1,25 +1,50 @@
-import fakeEvent from "simulant";
-import imageZoo from "./imageZoom";
+import imageZoom from "./imageZoom";
 
-test("zoom_in", () => {
+let image;
+let zoomIn;
+let zoomOut;
+
+beforeEach(() => {
   document.body.innerHTML = `
     <div class="zoom__box">
-      <img offsetWidth="10" style="width: 10px">
-      <div class="zoom__ctrl zoom__ctrl--in"></div>
-      <div class="zoom__ctrl zoom__ctrl--out"></div>
+      <img style="width: 100px">
+      <button class="zoom__ctrl zoom__ctrl--in"></button>
+      <button class="zoom__ctrl zoom__ctrl--out"></button>
     </div>
   `;
 
-  imageZoo();
+  image = document.querySelector("img");
+  zoomIn = document.querySelector(".zoom__ctrl--in");
+  zoomOut = document.querySelector(".zoom__ctrl--out");
 
-  const zoomCtrlIn = document.querySelector(".zoom__ctrl--in");
-  const image = document.querySelector("img");
+  Object.defineProperty(image, "offsetWidth", {
+    get: () => Number.parseInt(image.style.width, 10),
+  });
 
-  expect(image.style.width).toBe("10px");
+  imageZoom();
+});
 
-  fakeEvent.fire(zoomCtrlIn, "click");
+test("zoom in and out by 50px", () => {
+  zoomIn.click();
+  expect(image.style.width).toBe("150px");
+
+  zoomOut.click();
+  zoomOut.click();
   expect(image.style.width).toBe("50px");
+});
 
-  fakeEvent.fire(zoomCtrlIn, "click");
+test("does not shrink below the minimum width", () => {
+  image.style.width = "50px";
+
+  zoomOut.click();
+
   expect(image.style.width).toBe("50px");
+});
+
+test("does not grow above the maximum width", () => {
+  image.style.width = "3000px";
+
+  zoomIn.click();
+
+  expect(image.style.width).toBe("3000px");
 });

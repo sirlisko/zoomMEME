@@ -22,9 +22,8 @@ To re-build the solution:
 
 ## Under the hood
 
-- compile the JS files using [webpack 4.x](https://webpack.github.io/) and [babel](https://babeljs.io)
-- check the syntax of the JS, according to [StandardJS](http://standardjs.com/) (via [ESLint](http://eslint.org/))
-- unit tests with [Jest](https://facebook.github.io/jest/)
+- bundling and dev server via [Vite](https://vite.dev)
+- linting and formatting via [Biome](https://biomejs.dev)
+- unit tests with [Vitest](https://vitest.dev)
 - code coverage with [codecov](https://codecov.io)
 - Continuous Integration via [Codeship](https://codeship.com)
-- service workers, pre-cache and offline via [sw-toolbox](https://googlechrome.github.io/sw-toolbox/)

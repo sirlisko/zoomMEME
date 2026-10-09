@@ -17,7 +17,7 @@
   <meta property="og:image" content="https://zoomme.me/icon.png" />
 
   <link href="https://fonts.googleapis.com/css?family=Comfortaa:400|Chango" rel="stylesheet" type="text/css" />
-  <link href="style.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
@@ -38,30 +38,30 @@
       <span>Click here</span>
       <span>or</span>
       <span>Drop an Image!</span>
-      <input type="file" />
+      <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
     </label>
   </div>
   <article class="zoom" hidden>
     <ul class="zoom__box">
       <li>
-        <div class="zoom__ctrl zoom__ctrl--out">-</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
         <p></p>
-        <div class="zoom__ctrl zoom__ctrl--in">+</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
       </li>
       <li>
-        <div class="zoom__ctrl zoom__ctrl--out">-</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
         <p></p>
-        <div class="zoom__ctrl zoom__ctrl--in">+</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
       </li>
       <li>
-        <div class="zoom__ctrl zoom__ctrl--out">-</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
         <p></p>
-        <div class="zoom__ctrl zoom__ctrl--in">+</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
       </li>
       <li>
-        <div class="zoom__ctrl zoom__ctrl--out">-</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
         <p></p>
-        <div class="zoom__ctrl zoom__ctrl--in">+</div>
+        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
       </li>
     </ul>
     <label class="zoom__checkbox"><input type="checkbox" name="watermark" id="watermark" checked />Allow
@@ -79,10 +79,7 @@
         <a href="https://github.com/sirLisko/zoommeme">Github</a>.</span>
     </p>
   </footer>
-  <script>
-    'serviceWorker' in navigator &&
-      navigator.serviceWorker.register('/sw.js');
-  </script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 
 </html>

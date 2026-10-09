@@ -1,12 +1,10 @@
-import fakeEvent from "simulant";
 import imageSaver from "./imageSaver";
 
-jest.mock(
-  "html2canvas",
-  () => (box) => Promise.resolve({ toDataURL: jest.fn(() => "foo") })
-);
+const html2canvas = vi.hoisted(() => vi.fn());
+vi.mock("html2canvas", () => ({ default: html2canvas }));
 
 beforeEach(() => {
+  html2canvas.mockResolvedValue({ toDataURL: () => "foo" });
   document.body.innerHTML = `
     <div class="zoom__box"></div>
     <a class="zoom__save"></a>
@@ -14,19 +12,14 @@ beforeEach(() => {
   `;
 });
 
-test("should create the appropriate DataUrl image", (done) => {
+test("should create the appropriate DataUrl image", async () => {
   imageSaver();
-  let save = document.querySelector(".zoom__save");
+  const save = document.querySelector(".zoom__save");
 
-  fakeEvent.fire(save, "click");
+  save.click();
 
-  setTimeout(() => {
-    save = document.querySelector(".zoom__save");
-    expect(save.href).toContain("foo");
-    expect(save.download).toBe("zoommeme");
-
-    done();
-  }, 0);
+  await vi.waitFor(() => expect(save.href).toContain("foo"));
+  expect(save.download).toBe("zoommeme");
 });
 
 test("should set the correct class to the box", () => {
@@ -35,7 +28,21 @@ test("should set the correct class to the box", () => {
   const zoomBox = document.querySelector(".zoom__box");
   expect(zoomBox.classList).not.toContain("zoom__box--save");
 
-  fakeEvent.fire(save, "click");
+  save.click();
 
   expect(zoomBox.classList).toContain("zoom__box--save");
+});
+
+test("should restore the box and report when the export fails", async () => {
+  html2canvas.mockRejectedValue(new Error("boom"));
+  imageSaver();
+  const save = document.querySelector(".zoom__save");
+  const zoomBox = document.querySelector(".zoom__box");
+
+  save.click();
+
+  await vi.waitFor(() =>
+    expect(save.textContent).toBe("Save failed, try again"),
+  );
+  expect(zoomBox.classList).not.toContain("zoom__box--save");
 });

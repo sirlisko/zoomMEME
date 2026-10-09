@@ -1,10 +1,22 @@
-import mockEvent from "./utils";
 import imagePosition from "./imagePosition";
+import mockEvent from "./utils";
+
+const stubTouchDevice = (matches) => {
+  window.matchMedia = vi.fn(() => ({ matches }));
+};
+
+const setSize = (element, width, height) => {
+  Object.defineProperty(element, "offsetWidth", { value: width });
+  Object.defineProperty(element, "offsetHeight", { value: height });
+};
 
 beforeEach(() => {
+  stubTouchDevice(false);
   document.body.innerHTML = `
-    <img class="zoom__box"></img>
+    <div class="zoom__box"><p><img></p></div>
   `;
+  setSize(document.querySelector("p"), 300, 150);
+  setSize(document.querySelector("img"), 300, 200);
 });
 
 afterEach(() => {
@@ -32,7 +44,7 @@ test("mouse move", () => {
 });
 
 test("touch move", () => {
-  window.orientation = "landscape";
+  stubTouchDevice(true);
 
   const mockTouchStart = mockEvent(".zoom__box", "touchstart");
   const mockTouchMove = mockEvent(document, "touchmove");
@@ -58,6 +70,7 @@ test("if element is not image is not moving", () => {
     <div class="zoom__box"></div>
   `;
 
+  stubTouchDevice(true);
   const mockTouchStart = mockEvent(".zoom__box", "touchstart");
   const mockTouchMove = mockEvent(document, "touchmove");
 
@@ -71,5 +84,50 @@ test("if element is not image is not moving", () => {
     pageX: 10,
     pageY: 10,
   });
-  expect(mockTouchMove.cb).not.toBe("function");
+  expect(mockTouchMove.cb).toBeUndefined();
+});
+
+test("keeps part of the image inside the frame", () => {
+  const mockMouseDown = mockEvent(".zoom__box", "mousedown");
+  const mockMouseMove = mockEvent(document, "mousemove");
+
+  imagePosition();
+
+  const image = document.querySelector("img");
+
+  mockMouseDown.cb({
+    preventDefault: () => {},
+    target: image,
+    pageX: 1,
+    pageY: 1,
+  });
+  mockMouseMove.cb({ preventDefault: () => {}, pageX: 1000, pageY: 1000 });
+
+  expect(image.style.marginLeft).toBe("250px");
+  expect(image.style.marginTop).toBe("100px");
+
+  mockMouseMove.cb({ preventDefault: () => {}, pageX: -1000, pageY: -1000 });
+
+  expect(image.style.marginLeft).toBe("-250px");
+  expect(image.style.marginTop).toBe("-150px");
+});
+
+test("follows the mouse to the page origin", () => {
+  const mockMouseDown = mockEvent(".zoom__box", "mousedown");
+  const mockMouseMove = mockEvent(document, "mousemove");
+
+  imagePosition();
+
+  const image = document.querySelector("img");
+
+  mockMouseDown.cb({
+    preventDefault: () => {},
+    target: image,
+    pageX: 100,
+    pageY: 100,
+  });
+  mockMouseMove.cb({ preventDefault: () => {}, pageX: 0, pageY: 0 });
+
+  expect(image.style.marginLeft).toBe("-100px");
+  expect(image.style.marginTop).toBe("-100px");
 });

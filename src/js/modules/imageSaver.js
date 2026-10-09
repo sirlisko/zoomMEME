@@ -21,14 +21,19 @@ function saveCanvas({ target }) {
   const isWatermarkAllowed = document.getElementById("watermark").checked;
   zoomBox.classList.add("zoom__box--save");
 
-  html2canvas(zoomBox).then((canvas) => {
-    const editedCanvas = isWatermarkAllowed
-      ? addWatermark(canvas, watermarkText)
-      : canvas;
-    btn.href = editedCanvas.toDataURL("image/jpeg");
-    btn.download = "zoommeme";
-    btn.textContent = "Download Image";
-  });
+  html2canvas(zoomBox)
+    .then((canvas) => {
+      const editedCanvas = isWatermarkAllowed
+        ? addWatermark(canvas, watermarkText)
+        : canvas;
+      btn.href = editedCanvas.toDataURL("image/jpeg");
+      btn.download = "zoommeme";
+      btn.textContent = "Download Image";
+    })
+    .catch(() => {
+      zoomBox.classList.remove("zoom__box--save");
+      btn.textContent = "Save failed, try again";
+    });
 }
 
 function saveImage() {
