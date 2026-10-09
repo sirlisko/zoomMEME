@@ -111,3 +111,23 @@ test("keeps part of the image inside the frame", () => {
   expect(image.style.marginLeft).toBe("-250px");
   expect(image.style.marginTop).toBe("-150px");
 });
+
+test("follows the mouse to the page origin", () => {
+  const mockMouseDown = mockEvent(".zoom__box", "mousedown");
+  const mockMouseMove = mockEvent(document, "mousemove");
+
+  imagePosition();
+
+  const image = document.querySelector("img");
+
+  mockMouseDown.cb({
+    preventDefault: () => {},
+    target: image,
+    pageX: 100,
+    pageY: 100,
+  });
+  mockMouseMove.cb({ preventDefault: () => {}, pageX: 0, pageY: 0 });
+
+  expect(image.style.marginLeft).toBe("-100px");
+  expect(image.style.marginTop).toBe("-100px");
+});

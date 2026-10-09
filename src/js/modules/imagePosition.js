@@ -17,20 +17,20 @@ function clamp(value, size, frameSize) {
   return Math.min(Math.max(value, min), max);
 }
 
+function pointer(e) {
+  return e.touches ? e.touches[0] : e;
+}
+
 function moveImg(evt) {
   const target = evt.target;
-  const diffX =
-    (evt.pageX || evt.touches[0].pageX) -
-    parseInt(target.style.marginLeft || 0, 10);
-  const diffY =
-    (evt.pageY || evt.touches[0].pageY) -
-    parseInt(target.style.marginTop || 0, 10);
+  const diffX = pointer(evt).pageX - parseInt(target.style.marginLeft || 0, 10);
+  const diffY = pointer(evt).pageY - parseInt(target.style.marginTop || 0, 10);
 
   return (e) => {
     e.preventDefault();
     const { offsetWidth, offsetHeight, parentElement: frame } = target;
-    const x = (e.pageX || e.touches[0].pageX) - diffX;
-    const y = (e.pageY || e.touches[0].pageY) - diffY;
+    const x = pointer(e).pageX - diffX;
+    const y = pointer(e).pageY - diffY;
     target.style.marginLeft = `${clamp(x, offsetWidth, frame.offsetWidth)}px`;
     target.style.marginTop = `${clamp(y, offsetHeight, frame.offsetHeight)}px`;
   };
