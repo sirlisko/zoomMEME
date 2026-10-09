@@ -9,6 +9,14 @@ function eventsPerDevice() {
   return isTouchDevice() ? eventsMap.mobile : eventsMap.desktop;
 }
 
+const MIN_VISIBLE = 50;
+
+function clamp(value, size, frameSize) {
+  const min = MIN_VISIBLE - size;
+  const max = frameSize - MIN_VISIBLE;
+  return Math.min(Math.max(value, min), max);
+}
+
 function moveImg(evt) {
   const target = evt.target;
   const diffX =
@@ -20,8 +28,11 @@ function moveImg(evt) {
 
   return (e) => {
     e.preventDefault();
-    target.style.marginLeft = `${(e.pageX || e.touches[0].pageX) - diffX}px`;
-    target.style.marginTop = `${(e.pageY || e.touches[0].pageY) - diffY}px`;
+    const { offsetWidth, offsetHeight, parentElement: frame } = target;
+    const x = (e.pageX || e.touches[0].pageX) - diffX;
+    const y = (e.pageY || e.touches[0].pageY) - diffY;
+    target.style.marginLeft = `${clamp(x, offsetWidth, frame.offsetWidth)}px`;
+    target.style.marginTop = `${clamp(y, offsetHeight, frame.offsetHeight)}px`;
   };
 }
 
