@@ -15,20 +15,24 @@ function addWatermark(canvas, text) {
   return canvas;
 }
 
-function saveCanvas({ target }) {
-  const btn = target;
+function download(canvas) {
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/jpeg");
+  link.download = "zoommeme.jpg";
+  link.click();
+}
+
+function saveCanvas({ currentTarget: btn }) {
   const zoomBox = document.querySelector(".zoom__box");
   const isWatermarkAllowed = document.getElementById("watermark").checked;
   zoomBox.classList.add("zoom__box--save");
 
   html2canvas(zoomBox)
     .then((canvas) => {
-      const editedCanvas = isWatermarkAllowed
-        ? addWatermark(canvas, watermarkText)
-        : canvas;
-      btn.href = editedCanvas.toDataURL("image/jpeg");
-      btn.download = "zoommeme";
-      btn.textContent = "Download Image";
+      download(
+        isWatermarkAllowed ? addWatermark(canvas, watermarkText) : canvas,
+      );
+      btn.textContent = "Save Image";
     })
     .catch(() => {
       btn.textContent = "Save failed, try again";

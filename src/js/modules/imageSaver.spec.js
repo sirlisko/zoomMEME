@@ -7,19 +7,26 @@ beforeEach(() => {
   html2canvas.mockResolvedValue({ toDataURL: () => "foo" });
   document.body.innerHTML = `
     <div class="zoom__box"></div>
-    <a class="zoom__save"></a>
+    <button type="button" class="zoom__save"></button>
     <label class="zoom__checkbox"><input type="checkbox" name="watermark" id="watermark"></label>
   `;
 });
 
-test("should create the appropriate DataUrl image", async () => {
+test("should download the image in one click", async () => {
+  let link;
+  const click = vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(function () {
+      link = this;
+    });
   imageSaver();
-  const save = document.querySelector(".zoom__save");
 
-  save.click();
+  document.querySelector(".zoom__save").click();
 
-  await vi.waitFor(() => expect(save.href).toContain("foo"));
-  expect(save.download).toBe("zoommeme");
+  await vi.waitFor(() => expect(click).toHaveBeenCalledOnce());
+  expect(link.href).toContain("foo");
+  expect(link.download).toBe("zoommeme.jpg");
+  click.mockRestore();
 });
 
 test("should set the correct class to the box", () => {
