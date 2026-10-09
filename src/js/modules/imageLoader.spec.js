@@ -27,7 +27,7 @@ describe("file input", () => {
 
     mockInput.cb({ target: { files: [{ type: "text" }] } });
 
-    await expect(imageLoader).rejects.toThrow("Format not supported.");
+    await expect(imageLoader).rejects.toThrow("isn't supported");
   });
 });
 
@@ -37,7 +37,7 @@ test("rejects svg images", async () => {
 
   mockInput.cb({ target: { files: [{ type: "image/svg+xml" }] } });
 
-  await expect(imageLoader).rejects.toThrow("Format not supported.");
+  await expect(imageLoader).rejects.toThrow("isn't supported");
 });
 
 describe("file drop", () => {
@@ -62,7 +62,7 @@ describe("file drop", () => {
       dataTransfer: { files: [{ type: "text" }] },
     });
 
-    await expect(imageLoader).rejects.toThrow("Format not supported.");
+    await expect(imageLoader).rejects.toThrow("isn't supported");
   });
 });
 

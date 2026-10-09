@@ -1,12 +1,13 @@
 import errorHandler from "./errorHandler";
 
 beforeEach(() => {
-  document.body.innerHTML = "<article></article";
+  document.body.innerHTML = '<p class="error" hidden></p>';
 });
 
 test("errorHandler shows the message", () => {
-  errorHandler("foo");
+  errorHandler(new Error("foo"));
 
-  const errorLabel = document.querySelector(".error");
-  expect(errorLabel.innerText).toBe("An error occur foo");
+  const error = document.querySelector(".error");
+  expect(error.textContent).toBe("foo");
+  expect(error.hidden).toBe(false);
 });

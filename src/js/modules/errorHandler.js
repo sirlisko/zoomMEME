@@ -1,9 +1,7 @@
 function errorHandler(err) {
-  const error = document.createElement("p");
-  error.className = "error";
-  error.innerText = `An error occur ${err}`;
-
-  document.querySelector("article").appendChild(error);
+  const error = document.querySelector(".error");
+  error.textContent = err.message;
+  error.hidden = false;
 }
 
 export default errorHandler;

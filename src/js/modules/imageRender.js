@@ -9,7 +9,8 @@ function renderImage([file]) {
       resolve(image);
     };
 
-    reader.onerror = () => reject(new Error("Unable to read the file."));
+    reader.onerror = () =>
+      reject(new Error("That image couldn't be read. Choose another one."));
 
     reader.readAsDataURL(file);
   });

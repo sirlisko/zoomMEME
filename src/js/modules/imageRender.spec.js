@@ -23,5 +23,7 @@ test("should reject when the file cannot be read", async () => {
 
   reader.onerror();
 
-  await expect(result).rejects.toThrow("Unable to read the file.");
+  await expect(result).rejects.toThrow(
+    "That image couldn't be read. Choose another one.",
+  );
 });

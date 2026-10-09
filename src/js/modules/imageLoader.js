@@ -17,7 +17,11 @@ export default new Promise((resolve, reject) => {
       resolve(images);
       document.querySelector(".dropper").setAttribute("hidden", "hidden");
     } else {
-      reject(new Error("Format not supported."));
+      reject(
+        new Error(
+          "That file type isn't supported. Choose a JPEG, PNG, GIF or WebP image.",
+        ),
+      );
     }
   }
 
