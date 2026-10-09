@@ -1,7 +1,15 @@
 {
   "name": "zoomeme",
   "version": "1.0.0",
-  "description": "Super simple zoom-in meme generator.",
+  "description": "Make a zoom-in meme from any photo, as a stacked image or GIF, right in the browser.",
+  "keywords": [
+    "meme",
+    "meme-generator",
+    "zoom",
+    "gif",
+    "canvas",
+    "image-editor"
+  ],
   "main": "index.html",
   "scripts": {
     "start": "vite",
@@ -13,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sirLisko/zoomeme.git"
+    "url": "git+https://github.com/sirLisko/zoomMEME.git"
   },
   "author": {
     "name": "Luca Lischetti",
@@ -22,9 +30,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sirLisko/zoomeme/issues"
+    "url": "https://github.com/sirLisko/zoomMEME/issues"
   },
-  "homepage": "https://github.com/sirLisko/zoomeme#readme",
+  "homepage": "https://zoomme.me",
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "jsdom": "^30.1.2",
