@@ -24,17 +24,38 @@ function renderFineTune(list, frames) {
   });
 }
 
+const CHOICES = [
+  { selector: ".frame-count", key: "count", parse: Number },
+  { selector: ".output-choice", key: "output", parse: String },
+  { selector: ".speed-choice", key: "speed", parse: String },
+];
+
+function bindChoice(root, { selector, key, parse }, store) {
+  root.querySelector(selector).addEventListener("click", (e) => {
+    const option = e.target.closest("button");
+    if (!option) return;
+    const patch = { [key]: parse(option.value) };
+    if (key === "count") patch.adjustments = [];
+    store.set(patch);
+  });
+}
+
+function renderChoice(root, { selector, key }, state) {
+  for (const option of root.querySelectorAll(`${selector} button`)) {
+    option.setAttribute(
+      "aria-pressed",
+      String(option.value === String(state[key])),
+    );
+  }
+}
+
 export function bindControls(root, store) {
   const range = root.querySelector(".zoom-range");
   range.addEventListener("input", () =>
     store.set({ zoom: Number(range.value) }),
   );
 
-  root.querySelector(".frame-count").addEventListener("click", (e) => {
-    const chip = e.target.closest(".chip");
-    if (!chip) return;
-    store.set({ count: Number(chip.value), adjustments: [] });
-  });
+  for (const choice of CHOICES) bindChoice(root, choice, store);
 
   root.querySelector(".fine-tune__list").addEventListener("click", (e) => {
     const button = e.target.closest("button");
@@ -59,11 +80,7 @@ export function bindControls(root, store) {
 export function renderControls(root, state, frames) {
   root.querySelector(".zoom-range").value = state.zoom;
   root.querySelector(".zoom-value").textContent = formatZoom(state.zoom);
-  for (const chip of root.querySelectorAll(".frame-count .chip")) {
-    chip.setAttribute(
-      "aria-pressed",
-      String(Number(chip.value) === state.count),
-    );
-  }
+  for (const choice of CHOICES) renderChoice(root, choice, state);
+  root.querySelector(".gif-speed").hidden = state.output !== "gif";
   renderFineTune(root.querySelector(".fine-tune__list"), frames);
 }

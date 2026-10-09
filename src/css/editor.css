@@ -112,6 +112,28 @@
   border-color: var(--white);
 }
 
+.segmented {
+  background: var(--ink);
+  border-radius: 10px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+}
+.segmented__option {
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  color: var(--white);
+  cursor: pointer;
+  flex: 1;
+  font: 700 16px/1 var(--font-body);
+  min-height: 44px;
+}
+.segmented__option[aria-pressed="true"] {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
 .fine-tune {
   border-top: 2px solid rgb(255 255 255 / 0.35);
   padding-top: 1rem;

@@ -41,7 +41,7 @@
   <main class="landing" id="holder">
     <div class="landing__intro">
       <h1 class="landing__title caption">Make a zoom-in meme from any photo.</h1>
-      <p class="landing__lede">Pick the spot, choose how far to zoom, and download frames that close in on it.</p>
+      <p class="landing__lede">Pick the spot, choose how far to zoom, and get a stacked image or a GIF that closes in on it.</p>
       <div class="landing__actions">
         <label class="btn landing__pick">Choose a photo
           <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
@@ -98,7 +98,22 @@
     </section>
     <aside class="editor__result" aria-label="Your meme">
       <h2 class="editor__heading caption">Your meme</h2>
+      <fieldset class="setting">
+        <legend class="setting__label">Output</legend>
+        <div class="segmented output-choice">
+          <button type="button" class="segmented__option" value="stacked" aria-pressed="true">Stacked image</button>
+          <button type="button" class="segmented__option" value="gif" aria-pressed="false">GIF</button>
+        </div>
+      </fieldset>
       <canvas class="preview" role="img" aria-label="Preview of your meme"></canvas>
+      <fieldset class="setting gif-speed" hidden>
+        <legend class="setting__label">Speed</legend>
+        <div class="chips speed-choice">
+          <button type="button" class="chip" value="slow" aria-pressed="false">Slow</button>
+          <button type="button" class="chip" value="normal" aria-pressed="true">Normal</button>
+          <button type="button" class="chip" value="fast" aria-pressed="false">Fast</button>
+        </div>
+      </fieldset>
       <div class="editor__options">
         <label class="check"><input type="checkbox" class="overlay-toggle" checked /> Camcorder overlay</label>
         <label class="check"><input type="checkbox" class="credit-toggle" checked /> Add zoomme.me credit</label>

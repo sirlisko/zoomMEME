@@ -1,7 +1,9 @@
-import { bindActions } from "./actions";
+import { bindActions, renderActions } from "./actions";
 import { bindControls, renderControls } from "./controls";
 import { drawStack } from "./draw";
 import computeFrames from "./frames";
+import { SPEEDS } from "./gif";
+import createGifPreview from "./gifPreview";
 import osdDate from "./osdDate";
 import { bindSource, renderSource, showSource } from "./sourceView";
 import createStore from "./store";
@@ -34,23 +36,46 @@ export default function createEditor() {
     adjustments: [],
     overlay: true,
     credit: true,
+    output: "stacked",
+    speed: "normal",
   });
+  const gifPreview = createGifPreview(canvas);
+
+  function currentMeme() {
+    const state = store.get();
+    return {
+      image: state.image,
+      frames: framesFor(state),
+      options: {
+        overlay: state.overlay,
+        credit: state.credit,
+        date: osdDate(),
+      },
+      output: state.output,
+      speed: state.speed,
+    };
+  }
 
   store.subscribe((state) => {
-    if (!state.image) return;
-    const frames = framesFor(state);
+    if (!state.image) {
+      gifPreview.stop();
+      return;
+    }
+    const { image, frames, options } = currentMeme();
     renderSource(root, state, frames);
     renderControls(root, state, frames);
-    drawStack(canvas, state.image, frames, {
-      overlay: state.overlay,
-      credit: state.credit,
-      date: osdDate(),
-    });
+    renderActions(root, state);
+    if (state.output === "gif") {
+      gifPreview.play({ image, frames, options, delay: SPEEDS[state.speed] });
+    } else {
+      gifPreview.stop();
+      drawStack(canvas, image, frames, options);
+    }
   });
 
   bindSource(root, store);
   bindControls(root, store);
-  bindActions(root, canvas);
+  bindActions(root, canvas, currentMeme);
 
   newPhoto.addEventListener("click", () => {
     URL.revokeObjectURL(store.get().image.src);
