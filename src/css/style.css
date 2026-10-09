@@ -180,7 +180,7 @@ header p {
 }
 .zoom__box img {
   cursor: move;
-  width: 300px;
+  width: 100%;
   user-drag: none;
   user-select: none;
   -moz-user-select: none;
