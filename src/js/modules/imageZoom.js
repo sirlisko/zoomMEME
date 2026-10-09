@@ -1,3 +1,7 @@
+const STEP = 50;
+const MIN_WIDTH = 50;
+const MAX_WIDTH = 3000;
+
 function inOrOut(target) {
   return target.classList.contains("zoom__ctrl--in") ? 1 : -1;
 }
@@ -12,8 +16,8 @@ function imageZoom() {
     }
     e.preventDefault();
     const img = ctrl.parentNode.querySelector("img");
-    const width = img.offsetWidth;
-    img.style.width = `${width + inOrOut(ctrl) * 50}px`;
+    const width = img.offsetWidth + inOrOut(ctrl) * STEP;
+    img.style.width = `${Math.min(Math.max(width, MIN_WIDTH), MAX_WIDTH)}px`;
   });
 }
 
