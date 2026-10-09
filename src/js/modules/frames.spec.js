@@ -1,0 +1,79 @@
+import computeFrames, { zoomLevels } from "./frames";
+
+const landscape = { width: 1000, height: 500, focusX: 0.5, focusY: 0.5 };
+
+test("zoom levels step evenly from 1x to the maximum", () => {
+  const levels = zoomLevels(8, 4);
+
+  [1, 2, 4, 8].forEach((level, i) => {
+    expect(levels[i]).toBeCloseTo(level);
+  });
+});
+
+test("adjustments scale a single frame", () => {
+  expect(zoomLevels(8, 4, [0, 1, 0, 0])[1]).toBeCloseTo(2.5);
+});
+
+test("zoom never goes below 1x", () => {
+  expect(zoomLevels(8, 4, [-6])[0]).toBe(1);
+});
+
+test("the first frame covers a 2:1 photo entirely", () => {
+  const [first] = computeFrames({ ...landscape, zoom: 8, count: 4 });
+
+  expect(first).toMatchObject({ sx: 0, sy: 0, sw: 1000, sh: 500 });
+});
+
+test("later frames centre on the focus point", () => {
+  const frames = computeFrames({ ...landscape, zoom: 8, count: 4 });
+  const last = frames[3];
+
+  expect(last.sw).toBeCloseTo(125);
+  expect(last.sx + last.sw / 2).toBeCloseTo(500);
+  expect(last.sy + last.sh / 2).toBeCloseTo(250);
+});
+
+test("crops stay inside the photo near its edges", () => {
+  const frames = computeFrames({
+    ...landscape,
+    focusX: 0,
+    focusY: 1,
+    zoom: 4,
+    count: 3,
+  });
+
+  for (const f of frames) {
+    expect(f.sx).toBe(0);
+    expect(f.sy + f.sh).toBeCloseTo(500);
+  }
+});
+
+test("a portrait photo starts from its full width", () => {
+  const [first] = computeFrames({
+    width: 600,
+    height: 900,
+    focusX: 0.5,
+    focusY: 0.5,
+    zoom: 4,
+    count: 3,
+  });
+
+  expect(first.sw).toBe(600);
+  expect(first.sh).toBe(300);
+  expect(first.sy).toBe(300);
+});
+
+test("a very wide photo starts from its full height", () => {
+  const [first] = computeFrames({
+    width: 3000,
+    height: 500,
+    focusX: 0.5,
+    focusY: 0.5,
+    zoom: 4,
+    count: 3,
+  });
+
+  expect(first.sh).toBeCloseTo(500);
+  expect(first.sw).toBeCloseTo(1000);
+  expect(first.sx).toBeCloseTo(1000);
+});
