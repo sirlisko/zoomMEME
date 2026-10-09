@@ -1,8 +1,8 @@
 {
   "name": "zoomMEME",
   "short_name": "zoomMEME",
-  "theme_color": "#f1a208",
-  "background_color": "#052f5f",
+  "theme_color": "#2b59ff",
+  "background_color": "#2b59ff",
   "display": "fullscreen",
   "orientation": "portrait",
   "scope": "/",

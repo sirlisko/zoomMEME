@@ -3,81 +3,150 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>ZoomMEME</title>
-  <meta name="author" content="Luca Lischetti" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZoomME.ME: make a zoom-in meme from any photo</title>
+  <meta name="description" content="Click a spot in any photo and get a zoom-in meme as a stacked image or GIF. No sign-up, and your photo never leaves your device." />
+  <meta name="author" content="sirlisko" />
   <link type="text/plain" rel="author" href="https://sirlisko.com/humans.txt" />
-  <meta name="keywords" content="zoom, zoom-in, meme, generator" />
-  <meta name="description" content="Super simple zoom-in meme generator." />
-  <link rel="canonical" href="https://zoomme.me/">
+  <link rel="canonical" href="https://zoomme.me/" />
 
-  <meta property="og:url" content="https://zoomme.me" />
-  <meta property="og:description" content="Super simple zoom-in meme generator." />
-  <meta property="og:title" content="ZoomMEME" />
-  <meta property="og:image" content="https://zoomme.me/icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ZoomME.ME" />
+  <meta property="og:url" content="https://zoomme.me/" />
+  <meta property="og:title" content="ZoomME.ME: make a zoom-in meme from any photo" />
+  <meta property="og:description" content="Click a spot, pick how far to zoom, and download a stacked image or GIF, right in your browser." />
+  <meta property="og:image" content="https://zoomme.me/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="A ginger cat's eye at 1×, 2×, 4× and 8× zoom, next to the headline: Make a zoom-in meme from any photo." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ZoomME.ME",
+      "url": "https://zoomme.me/",
+      "description": "Click a spot in any photo and get a zoom-in meme as a stacked image or GIF.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "sirlisko", "url": "https://sirlisko.com" }
+    }
+  </script>
 
-  <link href="https://fonts.googleapis.com/css?family=Comfortaa:400|Chango" rel="stylesheet" type="text/css" />
-  <link href="/css/style.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Atkinson+Hyperlegible:wght@400;700&family=VT323&display=swap" rel="stylesheet" />
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/landing.css" rel="stylesheet" />
+  <link href="/css/editor.css" rel="stylesheet" />
 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#052f5f" />
-  <meta name="theme-color" content="#052f5f" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2b59ff" />
+  <meta name="theme-color" content="#2b59ff" />
 </head>
 
 <body>
-  <header>
-    <h1>ZoomME.ME</h1>
-    <p>Super simple zoom-in meme generator.</p>
+  <header class="site-header">
+    <p class="logo caption"><span class="logo__dot" aria-hidden="true"></span>ZoomME.ME</p>
+    <button type="button" class="btn btn--ghost new-photo" hidden>New photo</button>
   </header>
-  <div class="dropper">
-    <label id="holder">
-      <span>Click here</span>
-      <span>or</span>
-      <span>Drop an Image!</span>
-      <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
-    </label>
-  </div>
-  <article class="zoom" hidden>
-    <ul class="zoom__box">
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-      <li>
-        <button type="button" class="zoom__ctrl zoom__ctrl--out" aria-label="Zoom out">-</button>
-        <p></p>
-        <button type="button" class="zoom__ctrl zoom__ctrl--in" aria-label="Zoom in">+</button>
-      </li>
-    </ul>
-    <label class="zoom__checkbox"><input type="checkbox" name="watermark" id="watermark" checked />Allow
-      watermark on generated image</label>
-    <a class="zoom__save">Save Image</a>
-  </article>
-  <footer>
-    <p>
-      <span>Created with ♥ by
-        <a href="https://sirlisko.com">Luca Lischetti</a> (<a href="https://twitter.com/sirLisko">@sirLisko</a>).</span>
-      <span>Inspired by
-        <a href="https://twitter.com/GianlucaMezzo">GianlucaMezzo</a>
-        :-)</span>
-      <span>View project source on
-        <a href="https://github.com/sirLisko/zoommeme">Github</a>.</span>
-    </p>
+  <p class="error" role="alert" hidden></p>
+  <main class="landing" id="holder">
+    <div class="landing__intro">
+      <h1 class="landing__title caption">Make a zoom-in meme from any photo.</h1>
+      <p class="landing__lede">Pick the spot, choose how far to zoom, and get a stacked image or a GIF that closes in on it.</p>
+      <div class="landing__actions">
+        <label class="btn landing__pick">Choose a photo
+          <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
+        </label>
+        <p class="landing__hint">or drop one anywhere on this page, or paste it</p>
+      </div>
+      <p class="landing__note">JPEG, PNG, GIF or WebP. Your photo never leaves your device.</p>
+    </div>
+    <figure class="demo">
+      <div class="demo__screen">
+        <img class="demo__photo" alt="" />
+        <div class="osd" aria-hidden="true">
+          <div class="osd__top">
+            <span class="osd__rec demo__rec">REC</span>
+            <span class="osd__date"></span>
+          </div>
+          <span class="demo__zoom">
+            <span>ZOOM 1×</span>
+            <span>ZOOM 2×</span>
+            <span>ZOOM 4×</span>
+            <span>ZOOM 8×</span>
+          </span>
+        </div>
+      </div>
+      <figcaption class="demo__credit"><a></a></figcaption>
+    </figure>
+  </main>
+  <main class="editor" hidden>
+    <section class="editor__source" aria-label="Source photo">
+      <button type="button" class="source" aria-label="Focus point. Click a spot or use the arrow keys to move it.">
+        <img class="source__photo" alt="" />
+        <span class="source__marks" aria-hidden="true"></span>
+        <span class="source__focus" aria-hidden="true"></span>
+      </button>
+      <p class="editor__hint">Click the spot to zoom into. Arrow keys nudge it.</p>
+      <div class="editor__settings">
+        <label class="setting setting--zoom">
+          <span class="setting__label">Zoom <output class="zoom-value"></output></span>
+          <input type="range" class="zoom-range" min="2" max="16" step="1" />
+        </label>
+        <fieldset class="setting">
+          <legend class="setting__label">Frames</legend>
+          <div class="chips frame-count">
+            <button type="button" class="chip" value="3" aria-pressed="false">3</button>
+            <button type="button" class="chip" value="4" aria-pressed="true">4</button>
+            <button type="button" class="chip" value="5" aria-pressed="false">5</button>
+          </div>
+        </fieldset>
+      </div>
+      <details class="fine-tune">
+        <summary>Adjust frames one by one</summary>
+        <ul class="fine-tune__list"></ul>
+      </details>
+    </section>
+    <aside class="editor__result" aria-label="Your meme">
+      <h2 class="editor__heading caption">Your meme</h2>
+      <fieldset class="setting">
+        <legend class="setting__label">Output</legend>
+        <div class="segmented output-choice">
+          <button type="button" class="segmented__option" value="stacked" aria-pressed="true">Stacked image</button>
+          <button type="button" class="segmented__option" value="gif" aria-pressed="false">GIF</button>
+        </div>
+      </fieldset>
+      <canvas class="preview" role="img" aria-label="Preview of your meme"></canvas>
+      <fieldset class="setting gif-speed" hidden>
+        <legend class="setting__label">Speed</legend>
+        <div class="chips speed-choice">
+          <button type="button" class="chip" value="slow" aria-pressed="false">Slow</button>
+          <button type="button" class="chip" value="normal" aria-pressed="true">Normal</button>
+          <button type="button" class="chip" value="fast" aria-pressed="false">Fast</button>
+        </div>
+      </fieldset>
+      <div class="editor__options">
+        <label class="check"><input type="checkbox" class="overlay-toggle" checked /> Camcorder overlay</label>
+        <label class="check"><input type="checkbox" class="credit-toggle" checked /> Add zoomme.me credit</label>
+      </div>
+      <div class="editor__actions">
+        <button type="button" class="btn share" hidden>Share</button>
+        <button type="button" class="btn download">Download JPG</button>
+        <button type="button" class="btn btn--ghost copy" hidden>Copy image</button>
+      </div>
+      <p class="status" role="status"></p>
+    </aside>
+  </main>
+  <footer class="site-footer">
+    <span>Made by <a href="https://sirlisko.com">sirlisko</a>, inspired by <a href="https://twitter.com/GianlucaMezzo">Gianluca Mezzo</a>.</span>
+    <a href="https://github.com/sirLisko/zoommeme">Source on GitHub</a>
   </footer>
   <script type="module" src="/js/main.js"></script>
 </body>

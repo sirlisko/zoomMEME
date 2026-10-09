@@ -1,75 +1,104 @@
-import mockEvent from "./utils";
+import onImage from "./imageLoader";
+
+const png = { type: "image/png" };
+
+function choose(files) {
+  const input = document.querySelector("input");
+  Object.defineProperty(input, "files", { value: files, configurable: true });
+  input.dispatchEvent(new Event("change"));
+}
+
+function drop(files) {
+  const event = new Event("drop", { cancelable: true });
+  event.dataTransfer = { files };
+  document
+    .querySelector(".landing__intro")
+    .dispatchEvent(new Event("dragenter", { bubbles: true }));
+  document.dispatchEvent(event);
+  return event;
+}
+
+let callback;
 
 beforeEach(() => {
-  vi.resetModules();
-
   document.body.innerHTML = `
-    <div id="holder">
-      <input type="text" />
-    </div>
-    <div class="dropper"></div>
+    <main id="holder">
+      <div class="landing__intro"><input type="file" /></div>
+    </main>
+    <p class="error" hidden></p>
   `;
+  callback = vi.fn();
+  onImage(callback);
 });
 
-describe("file input", () => {
-  test("read files and filter images", async () => {
-    const mockInput = mockEvent("input", "onchange");
-    const imageLoader = (await import("./imageLoader")).default;
+test("passes on a chosen image", () => {
+  choose([png]);
 
-    mockInput.cb({ target: { files: [{ type: "image/png" }] } });
-
-    expect(await imageLoader).toBeTruthy();
-  });
-
-  test("read files and rise an error if not images", async () => {
-    const mockInput = mockEvent("input", "onchange");
-    const imageLoader = (await import("./imageLoader")).default;
-
-    mockInput.cb({ target: { files: [{ type: "text" }] } });
-
-    await expect(imageLoader).rejects.toThrow("Format not supported.");
-  });
+  expect(callback).toHaveBeenCalledWith(png);
 });
 
-test("rejects svg images", async () => {
-  const mockInput = mockEvent("input", "onchange");
-  const imageLoader = (await import("./imageLoader")).default;
+test("passes on a dropped image", () => {
+  const event = drop([{ type: "text/plain" }, png]);
 
-  mockInput.cb({ target: { files: [{ type: "image/svg+xml" }] } });
-
-  await expect(imageLoader).rejects.toThrow("Format not supported.");
+  expect(callback).toHaveBeenCalledWith(png);
+  expect(event.defaultPrevented).toBe(true);
 });
 
-describe("file drop", () => {
-  test("read files and filter images", async () => {
-    const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = (await import("./imageLoader")).default;
+test("shows an error for unsupported files, then accepts a retry", () => {
+  const error = document.querySelector(".error");
 
-    mockDrop.cb({
-      preventDefault: () => {},
-      dataTransfer: { files: [{ type: "image/png" }] },
-    });
+  choose([{ type: "image/svg+xml" }]);
 
-    expect(await imageLoader).toBeTruthy();
-  });
+  expect(callback).not.toHaveBeenCalled();
+  expect(error.hidden).toBe(false);
+  expect(error.textContent).toContain("isn't supported");
 
-  test("read files and rise an error if not images", async () => {
-    const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = (await import("./imageLoader")).default;
+  choose([png]);
 
-    mockDrop.cb({
-      preventDefault: () => {},
-      dataTransfer: { files: [{ type: "text" }] },
-    });
-
-    await expect(imageLoader).rejects.toThrow("Format not supported.");
-  });
+  expect(callback).toHaveBeenCalledWith(png);
+  expect(error.hidden).toBe(true);
 });
 
-test("disable holder dragover and dragend", async () => {
-  await import("./imageLoader");
+test("accepts more than one photo over time", () => {
+  choose([png]);
+  drop([png]);
 
-  const holder = document.querySelector("#holder");
-  expect(holder.ondragover()).toBeFalsy();
-  expect(holder.ondragend()).toBeFalsy();
+  expect(callback).toHaveBeenCalledTimes(2);
+});
+
+test("highlights the page while a file is dragged over it", () => {
+  const intro = document.querySelector(".landing__intro");
+
+  intro.dispatchEvent(new Event("dragenter", { bubbles: true }));
+
+  expect(document.body.classList).toContain("is-dragging");
+
+  intro.dispatchEvent(new Event("dragleave", { bubbles: true }));
+
+  expect(document.body.classList).not.toContain("is-dragging");
+});
+
+test("clears the highlight on drop", () => {
+  drop([png]);
+
+  expect(document.body.classList).not.toContain("is-dragging");
+});
+
+test("accepts a pasted image", () => {
+  const event = new Event("paste");
+  event.clipboardData = { files: [png] };
+
+  document.dispatchEvent(event);
+
+  expect(callback).toHaveBeenCalledWith(png);
+});
+
+test("ignores pastes without files", () => {
+  const event = new Event("paste");
+  event.clipboardData = { files: [] };
+
+  document.dispatchEvent(event);
+
+  expect(callback).not.toHaveBeenCalled();
+  expect(document.querySelector(".error").hidden).toBe(true);
 });

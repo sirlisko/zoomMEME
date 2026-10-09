@@ -25,14 +25,14 @@
     "url": "https://github.com/sirLisko/zoomeme/issues"
   },
   "homepage": "https://github.com/sirLisko/zoomeme#readme",
-  "dependencies": {
-    "html2canvas": "^1.3.2"
-  },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "jsdom": "^30.1.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.3"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "gifenc": "^1.0.3"
+  }
 }

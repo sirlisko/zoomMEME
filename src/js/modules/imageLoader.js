@@ -1,32 +1,48 @@
-const holder = document.getElementById("holder");
+import errorHandler, { clearError } from "./errorHandler";
 
-holder.ondragover = () => false;
-holder.ondragend = () => false;
+const UNSUPPORTED =
+  "That file type isn't supported. Choose a JPEG, PNG, GIF or WebP image.";
 
-function checkFiles(files) {
-  return Array.from(files).filter((file) =>
+function firstImage(files) {
+  return Array.from(files).find((file) =>
     /^image\/(jpeg|png|gif|webp)$/.test(file.type),
   );
 }
 
-export default new Promise((resolve, reject) => {
-  function readfiles(files) {
-    const images = checkFiles(files);
+export default function onImage(callback) {
+  const input = document.querySelector("#holder input");
 
-    if (images.length) {
-      resolve(images);
-      document.querySelector(".dropper").setAttribute("hidden", "hidden");
-    } else {
-      reject(new Error("Format not supported."));
+  function read(files) {
+    const image = firstImage(files);
+    if (!image) {
+      errorHandler(new Error(UNSUPPORTED));
+      return;
     }
+    clearError();
+    callback(image);
   }
 
-  holder.addEventListener("drop", (e) => {
-    e.preventDefault();
-    readfiles(e.dataTransfer.files);
-  });
+  // dragenter/dragleave fire for every child element, so count them.
+  let dragDepth = 0;
+  function setDragging(depth) {
+    dragDepth = depth;
+    document.body.classList.toggle("is-dragging", dragDepth > 0);
+  }
 
-  holder
-    .querySelector("input")
-    .addEventListener("change", (e) => readfiles(e.target.files));
-});
+  document.addEventListener("dragenter", () => setDragging(dragDepth + 1));
+  document.addEventListener("dragleave", () => setDragging(dragDepth - 1));
+  document.addEventListener("dragover", (e) => e.preventDefault());
+  document.addEventListener("drop", (e) => {
+    e.preventDefault();
+    setDragging(0);
+    read(e.dataTransfer.files);
+  });
+  document.addEventListener("paste", (e) => {
+    const { files } = e.clipboardData;
+    if (files.length) read(files);
+  });
+  input.addEventListener("change", () => {
+    read(input.files);
+    input.value = "";
+  });
+}
