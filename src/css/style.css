@@ -105,6 +105,10 @@ header p {
 }
 
 .zoom__ctrl {
+  background: none;
+  border: 0;
+  font-family: inherit;
+  padding: 0;
   cursor: pointer;
   color: #06a77d;
   font-size: 4rem;
