@@ -29,7 +29,7 @@ body {
   flex-direction: column;
   font-family: 'Comfortaa', cursive;
   font-size: 16px;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 h1 {
@@ -204,12 +204,6 @@ footer {
   font-size: 0.75rem;
   padding: 0 1rem;
   width: 100%;
-}
-@media (min-width: 500px) {
-  footer {
-    bottom: 0;
-    position: fixed;
-  }
 }
 footer p {
   line-height: 1.5;
