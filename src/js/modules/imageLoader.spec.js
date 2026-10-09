@@ -11,7 +11,10 @@ function choose(files) {
 function drop(files) {
   const event = new Event("drop", { cancelable: true });
   event.dataTransfer = { files };
-  document.getElementById("holder").dispatchEvent(event);
+  document
+    .querySelector(".landing__intro")
+    .dispatchEvent(new Event("dragenter", { bubbles: true }));
+  document.dispatchEvent(event);
   return event;
 }
 
@@ -19,7 +22,9 @@ let callback;
 
 beforeEach(() => {
   document.body.innerHTML = `
-    <main id="holder"><input type="file" /></main>
+    <main id="holder">
+      <div class="landing__intro"><input type="file" /></div>
+    </main>
     <p class="error" hidden></p>
   `;
   callback = vi.fn();
@@ -59,4 +64,41 @@ test("accepts more than one photo over time", () => {
   drop([png]);
 
   expect(callback).toHaveBeenCalledTimes(2);
+});
+
+test("highlights the page while a file is dragged over it", () => {
+  const intro = document.querySelector(".landing__intro");
+
+  intro.dispatchEvent(new Event("dragenter", { bubbles: true }));
+
+  expect(document.body.classList).toContain("is-dragging");
+
+  intro.dispatchEvent(new Event("dragleave", { bubbles: true }));
+
+  expect(document.body.classList).not.toContain("is-dragging");
+});
+
+test("clears the highlight on drop", () => {
+  drop([png]);
+
+  expect(document.body.classList).not.toContain("is-dragging");
+});
+
+test("accepts a pasted image", () => {
+  const event = new Event("paste");
+  event.clipboardData = { files: [png] };
+
+  document.dispatchEvent(event);
+
+  expect(callback).toHaveBeenCalledWith(png);
+});
+
+test("ignores pastes without files", () => {
+  const event = new Event("paste");
+  event.clipboardData = { files: [] };
+
+  document.dispatchEvent(event);
+
+  expect(callback).not.toHaveBeenCalled();
+  expect(document.querySelector(".error").hidden).toBe(true);
 });

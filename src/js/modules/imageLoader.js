@@ -10,8 +10,7 @@ function firstImage(files) {
 }
 
 export default function onImage(callback) {
-  const holder = document.getElementById("holder");
-  const input = holder.querySelector("input");
+  const input = document.querySelector("#holder input");
 
   function read(files) {
     const image = firstImage(files);
@@ -23,10 +22,24 @@ export default function onImage(callback) {
     callback(image);
   }
 
-  holder.addEventListener("dragover", (e) => e.preventDefault());
-  holder.addEventListener("drop", (e) => {
+  // dragenter/dragleave fire for every child element, so count them.
+  let dragDepth = 0;
+  function setDragging(depth) {
+    dragDepth = depth;
+    document.body.classList.toggle("is-dragging", dragDepth > 0);
+  }
+
+  document.addEventListener("dragenter", () => setDragging(dragDepth + 1));
+  document.addEventListener("dragleave", () => setDragging(dragDepth - 1));
+  document.addEventListener("dragover", (e) => e.preventDefault());
+  document.addEventListener("drop", (e) => {
     e.preventDefault();
+    setDragging(0);
     read(e.dataTransfer.files);
+  });
+  document.addEventListener("paste", (e) => {
+    const { files } = e.clipboardData;
+    if (files.length) read(files);
   });
   input.addEventListener("change", () => {
     read(input.files);

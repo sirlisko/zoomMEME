@@ -36,6 +36,11 @@ body {
   min-height: 100vh;
 }
 
+body.is-dragging {
+  outline: 6px dashed var(--yellow);
+  outline-offset: -14px;
+}
+
 a {
   color: var(--white);
 }
