@@ -1,12 +1,12 @@
+import isTouchDevice from "./device";
+
 const eventsMap = {
   desktop: { start: "mousedown", move: "mousemove", end: "mouseup" },
   mobile: { start: "touchstart", move: "touchmove", end: "touchend" },
 };
 
 function eventsPerDevice() {
-  return typeof window.orientation !== "undefined"
-    ? eventsMap.mobile
-    : eventsMap.desktop;
+  return isTouchDevice() ? eventsMap.mobile : eventsMap.desktop;
 }
 
 function moveImg(evt) {

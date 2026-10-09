@@ -1,7 +1,12 @@
 import imagePosition from "./imagePosition";
 import mockEvent from "./utils";
 
+const stubTouchDevice = (matches) => {
+  window.matchMedia = vi.fn(() => ({ matches }));
+};
+
 beforeEach(() => {
+  stubTouchDevice(false);
   document.body.innerHTML = `
     <img class="zoom__box"></img>
   `;
@@ -32,7 +37,7 @@ test("mouse move", () => {
 });
 
 test("touch move", () => {
-  window.orientation = "landscape";
+  stubTouchDevice(true);
 
   const mockTouchStart = mockEvent(".zoom__box", "touchstart");
   const mockTouchMove = mockEvent(document, "touchmove");
@@ -58,6 +63,7 @@ test("if element is not image is not moving", () => {
     <div class="zoom__box"></div>
   `;
 
+  stubTouchDevice(true);
   const mockTouchStart = mockEvent(".zoom__box", "touchstart");
   const mockTouchMove = mockEvent(document, "touchmove");
 
