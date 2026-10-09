@@ -1,5 +1,5 @@
-import mockEvent from "./utils";
 import imagePosition from "./imagePosition";
+import mockEvent from "./utils";
 
 beforeEach(() => {
   document.body.innerHTML = `

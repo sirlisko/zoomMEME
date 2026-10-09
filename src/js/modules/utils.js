@@ -7,7 +7,7 @@ export default function (selector, event) {
   const sel =
     selector === document ? document : document.querySelector(selector);
 
-  sel.addEventListener = (evt, cb) => {
+  sel.addEventListener = (_evt, cb) => {
     mock.cb = cb;
   };
 

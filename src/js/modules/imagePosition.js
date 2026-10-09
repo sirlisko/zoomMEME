@@ -35,7 +35,7 @@ function imagePosition() {
     const moveImage = moveImg(e);
 
     document.addEventListener(events.end, () =>
-      document.removeEventListener(events.move, moveImage)
+      document.removeEventListener(events.move, moveImage),
     );
     document.addEventListener(events.move, moveImage);
   });
