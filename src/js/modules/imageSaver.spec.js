@@ -33,6 +33,18 @@ test("should set the correct class to the box", () => {
   expect(zoomBox.classList).toContain("zoom__box--save");
 });
 
+test("should restore the zoom controls after a successful export", async () => {
+  imageSaver();
+  const save = document.querySelector(".zoom__save");
+  const zoomBox = document.querySelector(".zoom__box");
+
+  save.click();
+
+  await vi.waitFor(() =>
+    expect(zoomBox.classList).not.toContain("zoom__box--save"),
+  );
+});
+
 test("should restore the box and report when the export fails", async () => {
   html2canvas.mockRejectedValue(new Error("boom"));
   imageSaver();

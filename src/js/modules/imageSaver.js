@@ -31,9 +31,9 @@ function saveCanvas({ target }) {
       btn.textContent = "Download Image";
     })
     .catch(() => {
-      zoomBox.classList.remove("zoom__box--save");
       btn.textContent = "Save failed, try again";
-    });
+    })
+    .finally(() => zoomBox.classList.remove("zoom__box--save"));
 }
 
 function saveImage() {
