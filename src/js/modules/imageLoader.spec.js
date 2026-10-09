@@ -1,7 +1,7 @@
 import mockEvent from "./utils";
 
 beforeEach(() => {
-  jest.resetModules();
+  vi.resetModules();
 
   document.body.innerHTML = `
     <div id="holder">
@@ -12,71 +12,53 @@ beforeEach(() => {
 });
 
 describe("file input", () => {
-  test("read files and filter images", (done) => {
+  test("read files and filter images", async () => {
     const mockInput = mockEvent("input", "onchange");
-    const imageLoader = require("./imageLoader").default;
-
-    imageLoader
-      .then((image) => {
-        expect(image).toBeTruthy();
-        done();
-      })
-      .catch(done);
+    const imageLoader = (await import("./imageLoader")).default;
 
     mockInput.cb({ target: { files: [{ type: "image" }] } });
+
+    expect(await imageLoader).toBeTruthy();
   });
 
-  test("read files and rise an error if not images", (done) => {
+  test("read files and rise an error if not images", async () => {
     const mockInput = mockEvent("input", "onchange");
-    const imageLoader = require("./imageLoader").default;
+    const imageLoader = (await import("./imageLoader")).default;
 
-    imageLoader.then(done).catch((error) => {
-      expect(error).toEqual(expect.any(Error));
-      expect(error.message).toBe("Format not supported.");
-      done();
-    });
     mockInput.cb({ target: { files: [{ type: "text" }] } });
+
+    await expect(imageLoader).rejects.toThrow("Format not supported.");
   });
 });
 
 describe("file drop", () => {
-  test("read files and filter images", (done) => {
+  test("read files and filter images", async () => {
     const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = require("./imageLoader").default;
-
-    imageLoader
-      .then((image) => {
-        expect(image).toBeTruthy();
-        done();
-      })
-      .catch(done);
+    const imageLoader = (await import("./imageLoader")).default;
 
     mockDrop.cb({
       preventDefault: () => {},
       dataTransfer: { files: [{ type: "image" }] },
     });
+
+    expect(await imageLoader).toBeTruthy();
   });
 
-  test("read files and rise an error if not images", (done) => {
+  test("read files and rise an error if not images", async () => {
     const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = require("./imageLoader").default;
-
-    imageLoader.then(done).catch((error) => {
-      expect(error).toEqual(expect.any(Error));
-      expect(error.message).toBe("Format not supported.");
-      done();
-    });
+    const imageLoader = (await import("./imageLoader")).default;
 
     mockDrop.cb({
       preventDefault: () => {},
       dataTransfer: { files: [{ type: "text" }] },
     });
+
+    await expect(imageLoader).rejects.toThrow("Format not supported.");
   });
 });
 
-test("disable holder dragover and dragend", () => {
-  // eslint-disable-next-line no-unused-expressions
-  require("./imageLoader").default;
+test("disable holder dragover and dragend", async () => {
+  await import("./imageLoader");
 
   const holder = document.querySelector("#holder");
   expect(holder.ondragover()).toBeFalsy();

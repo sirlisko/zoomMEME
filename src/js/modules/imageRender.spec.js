@@ -1,16 +1,13 @@
 import imageRender from "./imageRender";
 
-const readAsDataURL = jest.fn();
+const readAsDataURL = vi.fn();
 
-window.FileReader = jest.fn(() => ({
-  readAsDataURL,
-}));
+window.FileReader = vi.fn(function () {
+  return { readAsDataURL };
+});
 
-test("should read the file", (done) => {
+test("should read the file", () => {
   imageRender(["foo"]);
 
-  setTimeout(() => {
-    expect(readAsDataURL).toHaveBeenCalledWith("foo");
-    done();
-  }, 0);
+  expect(readAsDataURL).toHaveBeenCalledWith("foo");
 });

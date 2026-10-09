@@ -1,4 +1,3 @@
-import fakeEvent from "simulant";
 import imageZoo from "./imageZoom";
 
 test("zoom_in", () => {
@@ -17,9 +16,9 @@ test("zoom_in", () => {
 
   expect(image.style.width).toBe("10px");
 
-  fakeEvent.fire(zoomCtrlIn, "click");
+  zoomCtrlIn.click();
   expect(image.style.width).toBe("50px");
 
-  fakeEvent.fire(zoomCtrlIn, "click");
+  zoomCtrlIn.click();
   expect(image.style.width).toBe("50px");
 });
