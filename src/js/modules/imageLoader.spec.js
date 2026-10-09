@@ -8,6 +8,7 @@ beforeEach(() => {
       <input type="text" />
     </div>
     <div class="dropper"></div>
+    <p class="error" hidden></p>
   `;
 });
 
@@ -21,23 +22,30 @@ describe("file input", () => {
     expect(await imageLoader).toBeTruthy();
   });
 
-  test("read files and rise an error if not images", async () => {
+  test("shows an error if not images, then accepts a retry", async () => {
     const mockInput = mockEvent("input", "onchange");
     const imageLoader = (await import("./imageLoader")).default;
+    const error = document.querySelector(".error");
 
     mockInput.cb({ target: { files: [{ type: "text" }] } });
 
-    await expect(imageLoader).rejects.toThrow("isn't supported");
+    expect(error.hidden).toBe(false);
+    expect(error.textContent).toContain("isn't supported");
+
+    mockInput.cb({ target: { files: [{ type: "image/png" }] } });
+
+    expect(await imageLoader).toBeTruthy();
+    expect(error.hidden).toBe(true);
   });
 });
 
 test("rejects svg images", async () => {
   const mockInput = mockEvent("input", "onchange");
-  const imageLoader = (await import("./imageLoader")).default;
+  await import("./imageLoader");
 
   mockInput.cb({ target: { files: [{ type: "image/svg+xml" }] } });
 
-  await expect(imageLoader).rejects.toThrow("isn't supported");
+  expect(document.querySelector(".error").hidden).toBe(false);
 });
 
 describe("file drop", () => {
@@ -53,16 +61,16 @@ describe("file drop", () => {
     expect(await imageLoader).toBeTruthy();
   });
 
-  test("read files and rise an error if not images", async () => {
+  test("shows an error if not images", async () => {
     const mockDrop = mockEvent("#holder", "ondrop");
-    const imageLoader = (await import("./imageLoader")).default;
+    await import("./imageLoader");
 
     mockDrop.cb({
       preventDefault: () => {},
       dataTransfer: { files: [{ type: "text" }] },
     });
 
-    await expect(imageLoader).rejects.toThrow("isn't supported");
+    expect(document.querySelector(".error").hidden).toBe(false);
   });
 });
 

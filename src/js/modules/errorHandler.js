@@ -4,4 +4,8 @@ function errorHandler(err) {
   error.hidden = false;
 }
 
+export function clearError() {
+  document.querySelector(".error").hidden = true;
+}
+
 export default errorHandler;

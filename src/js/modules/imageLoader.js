@@ -1,3 +1,5 @@
+import errorHandler, { clearError } from "./errorHandler";
+
 const holder = document.getElementById("holder");
 
 holder.ondragover = () => false;
@@ -9,15 +11,16 @@ function checkFiles(files) {
   );
 }
 
-export default new Promise((resolve, reject) => {
+export default new Promise((resolve) => {
   function readfiles(files) {
     const images = checkFiles(files);
 
     if (images.length) {
+      clearError();
       resolve(images);
       document.querySelector(".dropper").setAttribute("hidden", "hidden");
     } else {
-      reject(
+      errorHandler(
         new Error(
           "That file type isn't supported. Choose a JPEG, PNG, GIF or WebP image.",
         ),
