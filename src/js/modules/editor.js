@@ -37,7 +37,6 @@ export default function createEditor() {
     count: 4,
     adjustments: [],
     offsets: [],
-    selected: null,
     overlay: true,
     credit: true,
     output: "stacked",
@@ -106,7 +105,6 @@ export default function createEditor() {
         focusY: 0.5,
         adjustments: [],
         offsets: [],
-        selected: null,
       });
       // Canvas text falls back to a system font until the webfonts load.
       Promise.all(CANVAS_FONTS.map((font) => document.fonts?.load(font))).then(

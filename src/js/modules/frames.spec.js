@@ -1,4 +1,8 @@
-import computeFrames, { adjustmentForWidth, zoomLevels } from "./frames";
+import computeFrames, {
+  adjustmentForWidth,
+  resizeFrame,
+  zoomLevels,
+} from "./frames";
 
 const landscape = { width: 1000, height: 500, focusX: 0.5, focusY: 0.5 };
 
@@ -113,4 +117,49 @@ test("adjustmentForWidth stays within the fine-tune range", () => {
 
   expect(adjustmentForWidth({ ...args, fraction: 0.001 })).toBe(6);
   expect(adjustmentForWidth({ ...args, fraction: 5 })).toBe(-6);
+});
+
+test("resizeFrame keeps the top-left corner in place", () => {
+  const args = { ...landscape, zoom: 8, count: 4, adjustments: [], index: 2 };
+  const { adjustment, center } = resizeFrame({
+    ...args,
+    anchor: [0.2, 0.3],
+    pointer: [0.6, 0.4],
+  });
+  const [frame] = computeFrames({
+    ...landscape,
+    zoom: 8,
+    count: 4,
+    adjustments: [0, 0, adjustment],
+    offsets: [undefined, undefined, [center[0] - 0.5, center[1] - 0.5]],
+  }).slice(2);
+
+  expect(frame.sx).toBeCloseTo(200);
+  expect(frame.sy).toBeCloseTo(150);
+  expect(frame.sw).toBeCloseTo(400);
+});
+
+test("resizeFrame follows whichever axis the pointer pulls further", () => {
+  const args = { ...landscape, zoom: 8, count: 4, adjustments: [], index: 3 };
+  const { center } = resizeFrame({
+    ...args,
+    anchor: [0.1, 0.1],
+    pointer: [0.2, 0.5],
+  });
+
+  expect(center[1]).toBeCloseTo(0.3);
+});
+
+test("resizeFrame cannot grow frame 1 past the photo", () => {
+  const { adjustment } = resizeFrame({
+    ...landscape,
+    zoom: 8,
+    count: 4,
+    adjustments: [],
+    index: 0,
+    anchor: [0, 0],
+    pointer: [1, 1],
+  });
+
+  expect(zoomLevels(8, 4, [adjustment])[0]).toBe(1);
 });

@@ -73,3 +73,32 @@ export function adjustmentForWidth({
     MAX_ADJUST,
   );
 }
+
+// Resizes one frame by its bottom-right corner, keeping its top-left corner
+// (`anchor`, as photo fractions) in place. Returns the new adjustment and the
+// centre the frame needs to stay anchored.
+export function resizeFrame({
+  width,
+  height,
+  zoom,
+  count,
+  adjustments,
+  index,
+  anchor: [ax, ay],
+  pointer: [px, py],
+}) {
+  const aspect = height / width;
+  const fraction = Math.max(px - ax, ((py - ay) * aspect) / FRAME_RATIO, 1e-3);
+  const next = [...adjustments];
+  next[index] = adjustmentForWidth({
+    width,
+    height,
+    zoom,
+    count,
+    index,
+    fraction,
+  });
+  const w = baseWidth(width, height) / zoomLevels(zoom, count, next)[index];
+  const h = (w * FRAME_RATIO) / aspect;
+  return { adjustment: next[index], center: [ax + w / 2, ay + h / 2] };
+}

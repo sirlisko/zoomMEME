@@ -20,7 +20,7 @@ export function bindSource(root, store, getFrames) {
   const { consumeDrag } = bindFrameDrag(root, store, getFrames);
 
   root.querySelector(".reset-frames").addEventListener("click", () => {
-    store.set({ offsets: [] });
+    store.set({ offsets: [], adjustments: [] });
   });
 
   source.addEventListener("click", (e) => {
@@ -50,16 +50,23 @@ export function showSource(root, image) {
   root.querySelector(".source__photo").src = image.src;
 }
 
+function syncChildren(container, count) {
+  while (container.children.length < count) {
+    const child = document.createElement("span");
+    child.dataset.index = container.children.length;
+    container.append(child);
+  }
+  while (container.children.length > count) {
+    container.lastChild.remove();
+  }
+}
+
 export function renderSource(root, state, frames) {
   const { naturalWidth: w, naturalHeight: h } = state.image;
   const marks = root.querySelector(".source__marks");
-
-  while (marks.children.length < frames.length) {
-    marks.append(document.createElement("span"));
-  }
-  while (marks.children.length > frames.length) {
-    marks.lastChild.remove();
-  }
+  const handles = root.querySelector(".source__handles");
+  syncChildren(marks, frames.length);
+  syncChildren(handles, frames.length);
 
   frames.forEach((frame, i) => {
     Object.assign(marks.children[i].style, {
@@ -70,18 +77,16 @@ export function renderSource(root, state, frames) {
     });
     // A crop that already fills the photo has nowhere to move.
     marks.children[i].dataset.fixed = frame.sw >= w && frame.sh >= h ? "1" : "";
+    Object.assign(handles.children[i].style, {
+      left: percent((frame.sx + frame.sw) / w),
+      top: percent((frame.sy + frame.sh) / h),
+    });
   });
 
-  const handle = root.querySelector(".source__handle");
-  const target = frames[state.selected];
-  // Frame 1 is the baseline the others zoom from, so it has no handle.
-  handle.hidden = !target || state.selected === 0;
-  if (!handle.hidden) {
-    handle.style.left = percent((target.sx + target.sw) / w);
-    handle.style.top = percent((target.sy + target.sh) / h);
-  }
-
-  root.querySelector(".reset-frames").hidden = !state.offsets.some(Boolean);
+  root.querySelector(".reset-frames").hidden = ![
+    ...state.offsets,
+    ...state.adjustments,
+  ].some(Boolean);
 
   const focus = root.querySelector(".source__focus");
   focus.style.left = percent(state.focusX);
