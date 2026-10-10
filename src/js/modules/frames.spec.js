@@ -1,4 +1,4 @@
-import computeFrames, { zoomLevels } from "./frames";
+import computeFrames, { adjustmentForWidth, zoomLevels } from "./frames";
 
 const landscape = { width: 1000, height: 500, focusX: 0.5, focusY: 0.5 };
 
@@ -76,4 +76,41 @@ test("a very wide photo starts from its full height", () => {
   expect(first.sh).toBeCloseTo(500);
   expect(first.sw).toBeCloseTo(1000);
   expect(first.sx).toBeCloseTo(1000);
+});
+
+test("an offset moves a single frame off the focus point", () => {
+  const frames = computeFrames({
+    ...landscape,
+    zoom: 8,
+    count: 4,
+    offsets: [undefined, undefined, undefined, [0.25, 0]],
+  });
+
+  expect(frames[3].sx + frames[3].sw / 2).toBeCloseTo(750);
+  expect(frames[2].sx + frames[2].sw / 2).toBeCloseTo(500);
+});
+
+test("adjustmentForWidth round-trips through computeFrames", () => {
+  const adjustment = adjustmentForWidth({
+    ...landscape,
+    zoom: 8,
+    count: 4,
+    index: 2,
+    fraction: 0.5,
+  });
+  const frames = computeFrames({
+    ...landscape,
+    zoom: 8,
+    count: 4,
+    adjustments: [0, 0, adjustment],
+  });
+
+  expect(frames[2].sw).toBeCloseTo(500);
+});
+
+test("adjustmentForWidth stays within the fine-tune range", () => {
+  const args = { ...landscape, zoom: 8, count: 4, index: 3 };
+
+  expect(adjustmentForWidth({ ...args, fraction: 0.001 })).toBe(6);
+  expect(adjustmentForWidth({ ...args, fraction: 5 })).toBe(-6);
 });

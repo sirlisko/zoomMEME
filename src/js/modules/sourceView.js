@@ -1,3 +1,5 @@
+import bindFrameDrag, { pointerFraction } from "./frameDrag";
+
 const NUDGE = {
   ArrowLeft: [-0.02, 0],
   ArrowRight: [0.02, 0],
@@ -13,17 +15,19 @@ function percent(value) {
   return `${value * 100}%`;
 }
 
-export function bindSource(root, store) {
+export function bindSource(root, store, getFrames) {
   const source = root.querySelector(".source");
+  const { consumeDrag } = bindFrameDrag(root, store, getFrames);
+
+  root.querySelector(".reset-frames").addEventListener("click", () => {
+    store.set({ offsets: [] });
+  });
 
   source.addEventListener("click", (e) => {
     // Enter and Space also fire click, with no pointer position to use.
-    if (e.detail === 0) return;
-    const rect = source.getBoundingClientRect();
-    store.set({
-      focusX: clamp01((e.clientX - rect.left) / rect.width),
-      focusY: clamp01((e.clientY - rect.top) / rect.height),
-    });
+    if (e.detail === 0 || consumeDrag()) return;
+    const [focusX, focusY] = pointerFraction(source, e);
+    store.set({ focusX, focusY, offsets: [] });
   });
 
   source.addEventListener("keydown", (e) => {
@@ -50,21 +54,34 @@ export function renderSource(root, state, frames) {
   const { naturalWidth: w, naturalHeight: h } = state.image;
   const marks = root.querySelector(".source__marks");
 
-  while (marks.children.length < frames.length - 1) {
+  while (marks.children.length < frames.length) {
     marks.append(document.createElement("span"));
   }
-  while (marks.children.length > frames.length - 1) {
+  while (marks.children.length > frames.length) {
     marks.lastChild.remove();
   }
 
-  frames.slice(1).forEach((frame, i) => {
+  frames.forEach((frame, i) => {
     Object.assign(marks.children[i].style, {
       left: percent(frame.sx / w),
       top: percent(frame.sy / h),
       width: percent(frame.sw / w),
       height: percent(frame.sh / h),
     });
+    // A crop that already fills the photo has nowhere to move.
+    marks.children[i].dataset.fixed = frame.sw >= w && frame.sh >= h ? "1" : "";
   });
+
+  const handle = root.querySelector(".source__handle");
+  const target = frames[state.selected];
+  // Frame 1 is the baseline the others zoom from, so it has no handle.
+  handle.hidden = !target || state.selected === 0;
+  if (!handle.hidden) {
+    handle.style.left = percent((target.sx + target.sw) / w);
+    handle.style.top = percent((target.sy + target.sh) / h);
+  }
+
+  root.querySelector(".reset-frames").hidden = !state.offsets.some(Boolean);
 
   const focus = root.querySelector(".source__focus");
   focus.style.left = percent(state.focusX);

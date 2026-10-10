@@ -1,6 +1,4 @@
-import { formatZoom } from "./frames";
-
-const MAX_ADJUST = 6;
+import { formatZoom, MAX_ADJUST } from "./frames";
 
 function fineTuneRow(index) {
   const row = document.createElement("li");
