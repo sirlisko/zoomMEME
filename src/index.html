@@ -41,12 +41,10 @@
   <link href="/css/landing.css" rel="stylesheet" />
   <link href="/css/editor.css" rel="stylesheet" />
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2b59ff" />
   <meta name="theme-color" content="#2b59ff" />
 </head>
 
@@ -92,9 +90,11 @@
       <button type="button" class="source" aria-label="Focus point. Click a spot or use the arrow keys to move it.">
         <img class="source__photo" alt="" />
         <span class="source__marks" aria-hidden="true"></span>
+        <span class="source__handles" aria-hidden="true"></span>
         <span class="source__focus" aria-hidden="true"></span>
       </button>
-      <p class="editor__hint">Click the spot to zoom into. Arrow keys nudge it.</p>
+      <p class="editor__hint">Click the spot to zoom into. Drag an outline to move just that frame, or its corner to zoom it.</p>
+      <button type="button" class="btn btn--ghost reset-frames" hidden>Reset frames</button>
       <div class="editor__settings">
         <label class="setting setting--zoom">
           <span class="setting__label">Zoom <output class="zoom-value"></output></span>

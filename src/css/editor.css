@@ -31,6 +31,7 @@
   overflow: hidden;
   padding: 0;
   position: relative;
+  touch-action: none;
 }
 .source__photo {
   display: block;
@@ -42,6 +43,25 @@
   border: 2px solid var(--yellow);
   box-shadow: 0 0 0 1px var(--ink);
   pointer-events: none;
+  position: absolute;
+}
+.source__marks span.is-active {
+  background: rgb(255 255 255 / 0.2);
+  border-color: var(--white);
+}
+.source__handles span {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  cursor: nwse-resize;
+  height: 18px;
+  margin: -18px 0 0 -18px;
+  position: absolute;
+  width: 18px;
+}
+/* Wider invisible target so a fingertip can find it. */
+.source__handles span::after {
+  content: "";
+  inset: -14px;
   position: absolute;
 }
 .source__focus {

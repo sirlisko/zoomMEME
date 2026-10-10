@@ -1,5 +1,6 @@
 export const FRAME_RATIO = 0.5;
 const ADJUST_STEP = 1.25;
+export const MAX_ADJUST = 6;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -7,6 +8,10 @@ function clamp(value, min, max) {
 
 export function formatZoom(zoom) {
   return `${Math.round(zoom * 10) / 10}×`;
+}
+
+function baseWidth(width, height) {
+  return Math.min(1, height / width / FRAME_RATIO);
 }
 
 export function zoomLevels(maxZoom, count, adjustments = []) {
@@ -20,6 +25,7 @@ export function zoomLevels(maxZoom, count, adjustments = []) {
 
 // Crops are in source pixels, ready for drawImage. Frame 1 is the largest
 // 2:1 crop the photo allows; each later frame narrows in on the focus point.
+// An offset ([dx, dy], as photo fractions) moves one frame off that point.
 export default function computeFrames({
   width,
   height,
@@ -28,15 +34,17 @@ export default function computeFrames({
   zoom,
   count,
   adjustments,
+  offsets = [],
 }) {
   const aspect = height / width;
-  const base = Math.min(1, aspect / FRAME_RATIO);
+  const base = baseWidth(width, height);
 
-  return zoomLevels(zoom, count, adjustments).map((level) => {
+  return zoomLevels(zoom, count, adjustments).map((level, i) => {
+    const [dx, dy] = offsets[i] ?? [0, 0];
     const w = base / level;
     const h = w * FRAME_RATIO;
-    const x = clamp(focusX - w / 2, 0, 1 - w);
-    const y = clamp(focusY * aspect - h / 2, 0, aspect - h);
+    const x = clamp(focusX + dx - w / 2, 0, 1 - w);
+    const y = clamp((focusY + dy) * aspect - h / 2, 0, aspect - h);
     return {
       zoom: level,
       sx: x * width,
@@ -45,4 +53,52 @@ export default function computeFrames({
       sh: h * width,
     };
   });
+}
+
+// Inverse of zoomLevels for one frame: the adjustment that makes its crop
+// span `fraction` of the photo's width.
+export function adjustmentForWidth({
+  width,
+  height,
+  zoom,
+  count,
+  index,
+  fraction,
+}) {
+  const level = Math.max(1, baseWidth(width, height) / fraction);
+  const planned = zoom ** (index / (count - 1));
+  return clamp(
+    Math.log(level / planned) / Math.log(ADJUST_STEP),
+    -MAX_ADJUST,
+    MAX_ADJUST,
+  );
+}
+
+// Resizes one frame by its bottom-right corner, keeping its top-left corner
+// (`anchor`, as photo fractions) in place. Returns the new adjustment and the
+// centre the frame needs to stay anchored.
+export function resizeFrame({
+  width,
+  height,
+  zoom,
+  count,
+  adjustments,
+  index,
+  anchor: [ax, ay],
+  pointer: [px, py],
+}) {
+  const aspect = height / width;
+  const fraction = Math.max(px - ax, ((py - ay) * aspect) / FRAME_RATIO, 1e-3);
+  const next = [...adjustments];
+  next[index] = adjustmentForWidth({
+    width,
+    height,
+    zoom,
+    count,
+    index,
+    fraction,
+  });
+  const w = baseWidth(width, height) / zoomLevels(zoom, count, next)[index];
+  const h = (w * FRAME_RATIO) / aspect;
+  return { adjustment: next[index], center: [ax + w / 2, ay + h / 2] };
 }

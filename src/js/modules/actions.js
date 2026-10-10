@@ -6,27 +6,27 @@ import {
   jpegFile,
   share,
 } from "./exporter";
-import { encodeGif, SPEEDS } from "./gif";
+import { gifFile } from "./gifCache";
 
 function nextPaint() {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
-async function memeFile(meme, canvas, status) {
+async function memeFile(meme, canvas, status, gifCache) {
   if (meme.output !== "gif") return jpegFile(canvas);
+  const ready = gifCache.get(meme);
+  if (ready) return ready;
   status.textContent = "Making your GIF…";
   await nextPaint();
-  const { image, frames, options, speed } = meme;
-  const blob = encodeGif(image, frames, options, SPEEDS[speed]);
-  return new File([blob], "zoommeme.gif", { type: "image/gif" });
+  return gifFile(meme);
 }
 
-export function bindActions(root, canvas, currentMeme) {
+export function bindActions(root, canvas, currentMeme, gifCache) {
   const status = root.querySelector(".status");
 
   root.querySelector(".download").addEventListener("click", async () => {
     try {
-      const file = await memeFile(currentMeme(), canvas, status);
+      const file = await memeFile(currentMeme(), canvas, status, gifCache);
       download(file);
       status.textContent = `Downloaded ${file.name}`;
     } catch {
@@ -36,7 +36,7 @@ export function bindActions(root, canvas, currentMeme) {
 
   root.querySelector(".share").addEventListener("click", async () => {
     try {
-      await share(await memeFile(currentMeme(), canvas, status));
+      await share(await memeFile(currentMeme(), canvas, status, gifCache));
       status.textContent = "Shared";
     } catch (err) {
       status.textContent =

@@ -3,6 +3,7 @@ import { bindControls, renderControls } from "./controls";
 import { drawStack } from "./draw";
 import computeFrames from "./frames";
 import { SPEEDS } from "./gif";
+import createGifCache from "./gifCache";
 import createGifPreview from "./gifPreview";
 import osdDate from "./osdDate";
 import { bindSource, renderSource, showSource } from "./sourceView";
@@ -19,6 +20,7 @@ function framesFor(state) {
     zoom: state.zoom,
     count: state.count,
     adjustments: state.adjustments,
+    offsets: state.offsets,
   });
 }
 
@@ -34,12 +36,14 @@ export default function createEditor() {
     zoom: 8,
     count: 4,
     adjustments: [],
+    offsets: [],
     overlay: true,
     credit: true,
     output: "stacked",
     speed: "normal",
   });
   const gifPreview = createGifPreview(canvas);
+  const gifCache = createGifCache();
 
   function currentMeme() {
     const state = store.get();
@@ -59,6 +63,7 @@ export default function createEditor() {
   store.subscribe((state) => {
     if (!state.image) {
       gifPreview.stop();
+      gifCache.cancel();
       return;
     }
     const { image, frames, options } = currentMeme();
@@ -67,15 +72,17 @@ export default function createEditor() {
     renderActions(root, state);
     if (state.output === "gif") {
       gifPreview.play({ image, frames, options, delay: SPEEDS[state.speed] });
+      gifCache.prepare({ image, frames, options, speed: state.speed });
     } else {
       gifPreview.stop();
+      gifCache.cancel();
       drawStack(canvas, image, frames, options);
     }
   });
 
-  bindSource(root, store);
+  bindSource(root, store, () => framesFor(store.get()));
   bindControls(root, store);
-  bindActions(root, canvas, currentMeme);
+  bindActions(root, canvas, currentMeme, gifCache);
 
   newPhoto.addEventListener("click", () => {
     URL.revokeObjectURL(store.get().image.src);
@@ -92,7 +99,13 @@ export default function createEditor() {
       root.hidden = false;
       newPhoto.hidden = false;
       showSource(root, image);
-      store.set({ image, focusX: 0.5, focusY: 0.5, adjustments: [] });
+      store.set({
+        image,
+        focusX: 0.5,
+        focusY: 0.5,
+        adjustments: [],
+        offsets: [],
+      });
       // Canvas text falls back to a system font until the webfonts load.
       Promise.all(CANVAS_FONTS.map((font) => document.fonts?.load(font))).then(
         () => store.set({}),
