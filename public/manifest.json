@@ -1,10 +1,9 @@
 {
-  "name": "zoomMEME",
-  "short_name": "zoomMEME",
+  "name": "ZoomME.ME",
+  "short_name": "ZoomME.ME",
   "theme_color": "#2b59ff",
   "background_color": "#2b59ff",
-  "display": "fullscreen",
-  "orientation": "portrait",
+  "display": "standalone",
   "scope": "/",
   "start_url": "/",
   "icons": [
@@ -24,6 +23,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "splash_pages": null
+  ]
 }
